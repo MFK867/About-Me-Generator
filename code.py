@@ -296,8 +296,7 @@ else:
     if not connected:
         st.error(f"❌ Groq API Error: {status}")
         st.warning("Please check your API configuration")
-    else:
-        st.success("✅ Groq API Connected")
+
 
 # Initialize session state
 if 'generated_section' not in st.session_state:
@@ -477,4 +476,5 @@ if st.session_state.generated_section:
 # Footer
 st.markdown("---")
 st.markdown("💡 **Tip**: Fill in as much detail as possible for better results. The AI will tailor the content based on your target market and career aspirations.")
+
 st.markdown("🔄 **Note**: Each regeneration creates a unique variation with different emphasis and structure.")
