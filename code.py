@@ -147,7 +147,7 @@ def generate_cv_sections(data, variation_number=0):
 Always write exactly 70 words. Write in first person perspective.
 Create a unique and compelling narrative each time, varying sentence structure and emphasis.
 Variation #{variation_number + 1} - Make this version distinctly different from previous versions."""
-    
+
     prompt = f"""
 Generate a professional CV "About Me" section for someone with the following profile:
 
@@ -155,13 +155,9 @@ TARGET MARKET: {target_market}
 CAREER ASPIRATION: {aspiration}
 {aspiration_guidance}
 
-PERSONAL INFORMATION:
-Name: {data.get('name', '')}
-
 EDUCATION:
-Degree: {data.get('degree', '')}
+University: {data.get('university', 'N/A')}
 Major Subject: {data.get('major_subject', 'N/A')}
-CGPA: {data.get('cgpa', '')}
 Status: {data.get('degree_status', '')}
 Pass out: {data.get('passout_session', 'N/A')}
 Final Year Project: {data.get('final_year_project', 'N/A')}
@@ -211,12 +207,10 @@ VARIATION INSTRUCTION: This is variation #{variation_number + 1}. Make it distin
         return {
             "text": text,
             "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "name": data.get('name', ''),
             "designation": data.get('designation', ''),
             "market": target_market,
             "aspiration": aspiration,
             "university": data.get('university', ''),
-            "degree": data.get('degree', ''),
             "variation": variation_number + 1
         }
     
@@ -224,9 +218,7 @@ VARIATION INSTRUCTION: This is variation #{variation_number + 1}. Make it distin
 
 def get_random_sample_data():
     """Return random sample data for testing"""
-    sample_names = ["Ahmed Hassan", "Fatima Sheikh", "Ali Khan", "Ayesha Ahmad", "Usman Tariq"]
     sample_universities = ["LUMS", "NUST", "FAST", "UET", "COMSATS"]
-    sample_degrees = ["BSCS", "BSSE", "BS Data Science", "MBA", "BBA"]
     sample_majors = ["Computer Science", "Software Engineering", "Data Analytics", "Marketing", "Finance"]
     sample_orgs = ["TechSol", "DataCorp", "InnovateTech", "SoftSolutions", "Digital Dynamics"]
     sample_designations = ["Software Engineer", "Data Analyst", "Product Manager", "Web Developer", "Business Analyst"]
@@ -241,11 +233,8 @@ def get_random_sample_data():
     ]
     
     return {
-        'name': random.choice(sample_names),
         'university': random.choice(sample_universities),
-        'degree': random.choice(sample_degrees),
         'major_subject': random.choice(sample_majors),
-        'cgpa': f"{random.uniform(3.0, 4.0):.2f}/4.0",
         'degree_status': random.choice(["Completed", "In Progress"]),
         'passout_session': str(random.randint(2020, 2024)),
         'final_year_project': f"Smart {random.choice(['Attendance', 'Inventory', 'Learning', 'Health'])} System using AI",
@@ -297,7 +286,6 @@ else:
         st.error(f"❌ Groq API Error: {status}")
         st.warning("Please check your API configuration")
 
-
 # Initialize session state
 if 'generated_section' not in st.session_state:
     st.session_state.generated_section = None
@@ -324,11 +312,8 @@ with st.form("cv_form"):
     col1, col2 = st.columns(2)
     
     with col1:
-        name = st.text_input("Full Name*", value=st.session_state.autofill_data.get('name', ''), placeholder="Enter your full name")
         university = st.text_input("University", value=st.session_state.autofill_data.get('university', ''), placeholder="Your university name")
-        degree = st.text_input("Degree*", value=st.session_state.autofill_data.get('degree', ''), placeholder="e.g., BSCS, MBA")
         major_subject = st.text_input("Major Subject", value=st.session_state.autofill_data.get('major_subject', ''), placeholder="Your major subject")
-        cgpa = st.text_input("CGPA", value=st.session_state.autofill_data.get('cgpa', ''), placeholder="e.g., 3.5/4.0")
         degree_status = st.selectbox("Degree Status", ["Completed", "In Progress", "Expected"],
                                     index=["Completed", "In Progress", "Expected"].index(st.session_state.autofill_data.get('degree_status', 'Completed')))
         passout_session = st.text_input("Pass Out Session", value=st.session_state.autofill_data.get('passout_session', ''), placeholder="e.g., 2023")
@@ -338,9 +323,17 @@ with st.form("cv_form"):
         organization = st.text_input("Current/Most Recent Organization", value=st.session_state.autofill_data.get('organization', ''), placeholder="Company name")
         designation = st.text_input("Designation", value=st.session_state.autofill_data.get('designation', ''), placeholder="Your job title")
         experience_years = st.text_input("Experience Years", value=st.session_state.autofill_data.get('experience_years', ''), placeholder="e.g., 2 years")
+    
+    st.header("💼 Experience Details")
+    
+    col_exp1, col_exp2 = st.columns(2)
+    
+    with col_exp1:
         experience_status = st.selectbox("Experience Status", ["Current", "Previous", "None"],
                                         index=["Current", "Previous", "None"].index(st.session_state.autofill_data.get('experience_status', 'None')))
         industry = st.text_input("Industry", value=st.session_state.autofill_data.get('industry', ''), placeholder="e.g., IT, Finance")
+    
+    with col_exp2:
         work_detail = st.text_area("Work Detail", value=st.session_state.autofill_data.get('work_detail', ''), placeholder="Brief description of your work")
     
     st.header("🛠️ Skills & Achievements")
@@ -377,16 +370,13 @@ with st.form("cv_form"):
     submitted = st.form_submit_button("🚀 Generate About Me Section", type="primary")
     
     if submitted:
-        if not name or not degree or not achievements:
+        if not achievements:
             st.error("Please fill in all required fields (marked with *)")
         else:
             # Prepare data
             form_data = {
-                'name': name,
                 'university': university,
-                'degree': degree,
                 'major_subject': major_subject,
-                'cgpa': cgpa,
                 'degree_status': degree_status,
                 'passout_session': passout_session,
                 'final_year_project': final_year_project,
